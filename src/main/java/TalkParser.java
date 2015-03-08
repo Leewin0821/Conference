@@ -9,30 +9,35 @@ import java.util.regex.Pattern;
  */
 
 public final class TalkParser implements Parser {
+    private List<Talk> talkList = Lists.newArrayList();
 
     @Override
     public List<Talk> parse(List<String> lineList) {
-        List<Talk> talkList = Lists.newArrayList();
-        String regexOne = "(.*)(\\s)(\\d+)(min)";
-        String regexTwo = "(.*)(\\s)(lightning)";
-        Pattern patternOne = Pattern.compile(regexOne);
-        Pattern patternTwo = Pattern.compile(regexTwo);
+
+        String regexForCommon = "(.*)(\\s)(\\d+)(min)";
+        String regexForLightning = "(.*)(\\s)(lightning)";
 
         for (String inputLine : lineList) {
             if (!inputLine.contains("lightning")){
-                Matcher matcher = patternOne.matcher(inputLine);
-                if (matcher.find()) {
-                    Talk talk = new Talk(matcher.group(1), Integer.valueOf(matcher.group(3)));
-                    talkList.add(talk);
-                }
+                matchAndAddTalk(regexForCommon, inputLine, false);
             } else {
-                Matcher matcher = patternTwo.matcher(inputLine);
-                if (matcher.find()) {
-                    Talk talk = new Talk(matcher.group(1), 5);
-                    talkList.add(talk);
-                }
+                matchAndAddTalk(regexForLightning, inputLine, true);
             }
         }
         return talkList;
+    }
+
+    private void matchAndAddTalk(String regex, String inputLine, Boolean isLightning) {
+        Talk talk;
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(inputLine);
+        if (matcher.find()) {
+            if (!isLightning){
+                talk = new Talk(matcher.group(1), Integer.valueOf(matcher.group(3)));
+            } else {
+                talk = new Talk(matcher.group(1), 5);
+            }
+            talkList.add(talk);
+        }
     }
 }
