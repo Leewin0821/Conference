@@ -16,73 +16,61 @@ public final class TalkDispatcher implements Dispatcher {
 
     int currentCapacity = 0;
     int currentBestCapacity = 0;
-    int restTimeCapacity = 0;
+    int restTimeCapacity;
     int totalTalkQuantity;
-    int currentTalkLength;
     int[] currentSolution;
     int[] currentBestSolution;
 
     public TalkDispatcher(List<Talk> talkList) {
         this.talkList = talkList;
+        totalTalkQuantity = talkList.size();
+        currentSolution = new int[totalTalkQuantity];
+        currentBestSolution = new int[totalTalkQuantity];
     }
 
     @Override
     public List<Session> dispatch() {
         List<Session> sessionList = Lists.newArrayList();
-        for (; talkList.size() != 0; ) {
-            backtrace(0);
-            List<Talk> schemedTalks = Lists.newLinkedList();
-            for (Talk talk : talkList) {
-                if (talk.isSchemed()) {
-                    schemedTalks.add(talk);
-                    talkList.remove(talk);
-                }
-            }
-            Session session = new Session(schemedTalks);
-            sessionList.add(session);
+        for (Talk talk : talkList) {
+            restTimeCapacity += talk.getTalkLength();
         }
+        backtrace(0);
+        List<Talk> schemedTalks = Lists.newLinkedList();
+        for (Talk talk : talkList) {
+            if (talk.isSchemed()) {
+                schemedTalks.add(talk);
+//                talkList.remove(talk);
+            }
+        }
+        Session session = new Session(schemedTalks);
+        sessionList.add(session);
         return sessionList;
     }
 
     private void backtrace(int index) {
-        totalTalkQuantity = talkList.size();
-        currentTalkLength = talkList.get(index).getTalkLength();
-        for (Talk talk : talkList) {
-            restTimeCapacity += talk.getTalkLength();
-        }
-        currentSolution = new int[totalTalkQuantity];
-        currentBestSolution = new int[totalTalkQuantity];
-        System.out.println(currentCapacity);
-        System.out.println(currentTalkLength);
-        System.out.println(currentBestCapacity);
-        System.out.println(restTimeCapacity);
-        System.out.println("***********************");
         if (index > totalTalkQuantity - 1) {
             if (currentCapacity > currentBestCapacity) {
                 for (int j = 0; j < totalTalkQuantity; j++) {
                     currentBestSolution[j] = currentSolution[j];
                     currentBestCapacity = currentCapacity;
                 }
-                for (int indexOfBestArray = 0; indexOfBestArray<currentBestSolution.length; indexOfBestArray++ ){
-                    if (currentBestSolution[indexOfBestArray]==1){
-                        talkList.get(indexOfBestArray).setSchemed(true);
-                    }
-                }
                 return;
             }
         }
-        restTimeCapacity -= currentTalkLength;
-        if (currentCapacity + currentTalkLength < SESSION_CAPACITY) {
+        restTimeCapacity -= talkList.get(index).getTalkLength();
+        if (currentCapacity + talkList.get(index).getTalkLength() < SESSION_CAPACITY) {
             currentSolution[index] = 1;
-            currentCapacity += currentTalkLength;
+            talkList.get(index).setSchemed(true);
+            currentCapacity += talkList.get(index).getTalkLength();
             backtrace(index + 1);
-            currentCapacity -= currentTalkLength;
+            currentCapacity -= talkList.get(index).getTalkLength();
         }
         if (currentCapacity + restTimeCapacity > currentBestCapacity) {
             currentSolution[index] = 0;
+            talkList.get(index).setSchemed(false);
             backtrace(index + 1);
         }
-        restTimeCapacity += currentTalkLength;
+        restTimeCapacity += talkList.get(index).getTalkLength();
     }
 
 }

@@ -40,20 +40,17 @@ public class Loading {
     public static void main(String[] args) {
         Loading loading = new Loading();
 
-        Scanner scanner = new Scanner(System.in);
-        String s1 = scanner.nextLine();
-        loading.boxNumber = Integer.parseInt(s1);
-        loading.boxWeights = new int[loading.boxNumber];
+        loading.boxNumber = 3;
+        loading.boxWeights = new int[]{60, 30, 45};
         loading.currentSolution = new int[loading.boxNumber];
         loading.currentBestSolution = new int[loading.boxNumber];
         System.out.println("输出货物的重量数组：");
-        for (int i = 0; i < loading.boxNumber; i++) {
-            loading.boxWeights[i] = (int) (100 * Math.random());
-            System.out.println(loading.boxWeights[i]);
-        }
+//        for (int i = 0; i < loading.boxNumber; i++) {
+//            loading.boxWeights[i] = (int) (100 * Math.random());
+//            System.out.println(loading.boxWeights[i]);
+//        }
 
-        String s2 = scanner.nextLine();
-        loading.capacityOfFirstShip = Integer.parseInt(s2);
+        loading.capacityOfFirstShip = 120;
 
         for (int i = 0; i < loading.boxNumber; i++)
             loading.weightOfRestBoxes += loading.boxWeights[i];
