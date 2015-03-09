@@ -1,4 +1,8 @@
+package service;
+
 import com.google.common.collect.Lists;
+import domain.Talk;
+import service.Parser;
 
 import java.util.List;
 import java.util.regex.Matcher;

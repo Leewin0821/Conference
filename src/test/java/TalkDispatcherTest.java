@@ -1,8 +1,10 @@
 import com.google.common.collect.ImmutableList;
+import domain.Session;
+import domain.Talk;
 import org.junit.Test;
+import service.TalkDispatcher;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -12,7 +14,6 @@ public class TalkDispatcherTest {
     @Test
     public void should_return_map_of_talks_given_talk_list() throws Exception {
         //Given
-        TalkDispatcher talkDispatcher = new TalkDispatcher();
         ImmutableList<Talk> talkList = ImmutableList.of(
                 new Talk("Writing Fast Tests Against Enterprise Rails", 60),
                 new Talk("Overdoing it in Python", 45),
@@ -24,11 +25,16 @@ public class TalkDispatcherTest {
                 new Talk("Accounting-Driven Development", 45),
                 new Talk("Woah", 30),
                 new Talk("Sit Down and Write", 30));
+        TalkDispatcher talkDispatcher = new TalkDispatcher(talkList);
 
         //When
-        Map<Integer, List<Talk>> listMap = talkDispatcher.dispatch(talkList);
+        List<Session> sessions = talkDispatcher.dispatch();
 
         //Then
-        assertThat(listMap.size(), is(4));
+        assertThat(sessions.size(), is(4));
+        assertThat(sessions.get(0).countTimeConsumption(), is(120));
+        assertThat(sessions.get(1).countTimeConsumption(), is(120));
+        assertThat(sessions.get(2).countTimeConsumption(), is(120));
+        assertThat(sessions.get(3).countTimeConsumption(), is(35));
     }
 }

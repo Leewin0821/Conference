@@ -1,6 +1,9 @@
+package service;
+
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
+import service.FileReader;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,5 +1,7 @@
 import com.google.common.collect.ImmutableList;
+import domain.Talk;
 import org.junit.Test;
+import service.TalkParser;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
