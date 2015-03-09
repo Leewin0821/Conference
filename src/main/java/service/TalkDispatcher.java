@@ -34,16 +34,18 @@ public final class TalkDispatcher implements Dispatcher {
         for (Talk talk : talkList) {
             restTimeCapacity += talk.getTalkLength();
         }
-        backtrace(0);
-        List<Talk> schemedTalks = Lists.newLinkedList();
-        for (Talk talk : talkList) {
-            if (talk.isSchemed()) {
-                schemedTalks.add(talk);
-//                talkList.remove(talk);
+//        for (;talkList.size()!=1;){
+            backtrace(0);
+            List<Talk> schemedTalks = Lists.newLinkedList();
+            for (int index=0; index<currentBestSolution.length; index++) {
+                if (currentBestSolution[index] == 1){
+                    schemedTalks.add(talkList.get(index));
+                }
             }
-        }
-        Session session = new Session(schemedTalks);
-        sessionList.add(session);
+            talkList.removeAll(schemedTalks);
+            Session session = new Session(schemedTalks);
+            sessionList.add(session);
+//        }
         return sessionList;
     }
 
@@ -58,16 +60,14 @@ public final class TalkDispatcher implements Dispatcher {
             }
         }
         restTimeCapacity -= talkList.get(index).getTalkLength();
-        if (currentCapacity + talkList.get(index).getTalkLength() < SESSION_CAPACITY) {
+        if (currentCapacity + talkList.get(index).getTalkLength() <= SESSION_CAPACITY) {
             currentSolution[index] = 1;
-            talkList.get(index).setSchemed(true);
             currentCapacity += talkList.get(index).getTalkLength();
             backtrace(index + 1);
             currentCapacity -= talkList.get(index).getTalkLength();
         }
         if (currentCapacity + restTimeCapacity > currentBestCapacity) {
             currentSolution[index] = 0;
-            talkList.get(index).setSchemed(false);
             backtrace(index + 1);
         }
         restTimeCapacity += talkList.get(index).getTalkLength();

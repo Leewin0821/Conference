@@ -4,6 +4,7 @@ import domain.Talk;
 import org.junit.Test;
 import service.TalkDispatcher;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -42,10 +43,12 @@ public class TalkDispatcherTest {
     @Test
     public void should_return_one_session_given_less_than_240min_talks_list() throws Exception {
         //Given
-        ImmutableList<Talk> talks = ImmutableList.of(
-                new Talk("Writing Fast Tests Against Enterprise Rails", 60),
-                new Talk("Lua for the Masses", 30),
-                new Talk("Ruby Errors from Mismatched Gem Versions", 45));
+        List<Talk> talks = new ArrayList<Talk>();
+        talks.add(new Talk("Writing Fast Tests Against Enterprise Rails", 60));
+        talks.add(new Talk("Lua for the Masses", 30));
+        talks.add(new Talk("Ruby Errors from Mismatched Gem Versions", 45));
+        talks.add(new Talk("Communicating Over Distance", 60));
+
         TalkDispatcher dispatcher = new TalkDispatcher(talks);
 
         //When
@@ -53,6 +56,6 @@ public class TalkDispatcherTest {
 
         //Then
         assertThat(sessions.size(), is(1));
-        assertThat(sessions.get(0).countTimeConsumption(), is(105));
+        assertThat(sessions.get(0).countTimeConsumption(), is(120));
     }
 }

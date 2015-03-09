@@ -11,7 +11,7 @@ public class Loading {
     private int[] currentBestSolution;//当前最优解
 
     public void backtrace(int index) {
-        //1.到达叶节点  
+        //1.到达叶节点
         if (index > boxNumber -1) {   //i此时的值=叶节点+1
             if (currentCapacity > currentBestCapacity) {
                 for (int j = 0; j < boxNumber; j++) {
@@ -22,14 +22,14 @@ public class Loading {
             }
         }
         weightOfRestBoxes -= boxWeights[index];
-        //2.搜索左子树  
-        if (currentCapacity + boxWeights[index] < capacityOfFirstShip) {
+        //2.搜索左子树
+        if (currentCapacity + boxWeights[index] <= capacityOfFirstShip) {
             currentSolution[index] = 1;
             currentCapacity += boxWeights[index];
             backtrace(index + 1);
             currentCapacity -= boxWeights[index];
         }
-        //3.搜索右子树  
+        //3.搜索右子树
         if (currentCapacity + weightOfRestBoxes > currentBestCapacity) {
             currentSolution[index] = 0;
             backtrace(index + 1);
@@ -40,8 +40,8 @@ public class Loading {
     public static void main(String[] args) {
         Loading loading = new Loading();
 
-        loading.boxNumber = 3;
-        loading.boxWeights = new int[]{60, 30, 45};
+        loading.boxNumber = 4;
+        loading.boxWeights = new int[]{60, 30, 45, 60};
         loading.currentSolution = new int[loading.boxNumber];
         loading.currentBestSolution = new int[loading.boxNumber];
         System.out.println("输出货物的重量数组：");
