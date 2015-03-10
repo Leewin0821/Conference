@@ -1,8 +1,10 @@
 package service;
 
+import algorithm.Algorithm;
 import com.google.common.collect.Lists;
 import domain.Session;
 import domain.Talk;
+import domain.Track;
 
 import java.util.List;
 
@@ -11,8 +13,10 @@ import java.util.List;
  */
 public final class TalkDispatcher implements Dispatcher {
 
+
     private final int SESSION_CAPACITY = 120;
     private List<Talk> talkList;
+    private Algorithm algorithm;
 
     int currentCapacity = 0;
     int currentBestCapacity = 0;
@@ -28,8 +32,14 @@ public final class TalkDispatcher implements Dispatcher {
         currentBestSolution = new int[totalTalkQuantity];
     }
 
+    public TalkDispatcher(List<Talk> talkList, Algorithm algorithm) {
+        this.talkList = talkList;
+        this.algorithm = algorithm;
+    }
+
+    //TODO: Extract algorithm to a separate class
     @Override
-    public List<Session> dispatch() {
+    public List<Track> dispatch() {
         List<Session> sessionList = Lists.newArrayList();
         for (Talk talk : talkList) {
             restTimeCapacity += talk.getTalkLength();
