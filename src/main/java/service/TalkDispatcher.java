@@ -2,10 +2,11 @@ package service;
 
 import algorithm.Algorithm;
 import com.google.common.collect.Lists;
-import domain.Session;
-import domain.Talk;
-import domain.Track;
+import domain.*;
+import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.Arrays;
+import java.util.InputMismatchException;
 import java.util.List;
 
 /**
@@ -13,74 +14,62 @@ import java.util.List;
  */
 public final class TalkDispatcher implements Dispatcher {
 
-
-    private final int SESSION_CAPACITY = 120;
     private List<Talk> talkList;
     private Algorithm algorithm;
-
-    int currentCapacity = 0;
-    int currentBestCapacity = 0;
-    int restTimeCapacity;
-    int totalTalkQuantity;
-    int[] currentSolution;
-    int[] currentBestSolution;
-
-    public TalkDispatcher(List<Talk> talkList) {
-        this.talkList = talkList;
-        totalTalkQuantity = talkList.size();
-        currentSolution = new int[totalTalkQuantity];
-        currentBestSolution = new int[totalTalkQuantity];
-    }
+    private int count = 0;
+    private List<Session> schemedSessionsList;
+    private List<Track> trackList;
 
     public TalkDispatcher(List<Talk> talkList, Algorithm algorithm) {
         this.talkList = talkList;
         this.algorithm = algorithm;
+        schemedSessionsList = Lists.newLinkedList();
+        trackList = Lists.newLinkedList();
     }
 
-    //TODO: Extract algorithm to a separate class
     @Override
     public List<Track> dispatch() {
-        List<Session> sessionList = Lists.newArrayList();
-        for (Talk talk : talkList) {
-            restTimeCapacity += talk.getTalkLength();
-        }
-//        for (;talkList.size()!=1;){
-            backtrace(0);
-            List<Talk> schemedTalks = Lists.newLinkedList();
-            for (int index=0; index<currentBestSolution.length; index++) {
-                if (currentBestSolution[index] == 1){
-                    schemedTalks.add(talkList.get(index));
-                }
+        loadTalksIntoSessions();
+        for (int index=0; index < schemedSessionsList.size(); index++){
+            Track track = null;
+            if (index%2 == 0){
+                track = new Track();
+                track.addSession(schemedSessionsList.get(index));
+            } else {
+                track.addSession(schemedSessionsList.get(index));
+                trackList.add(track);
             }
-            talkList.removeAll(schemedTalks);
-            Session session = new Session(schemedTalks);
-            sessionList.add(session);
-//        }
-        return sessionList;
+        }
+        return trackList;
     }
 
-    private void backtrace(int index) {
-        if (index > totalTalkQuantity - 1) {
-            if (currentCapacity > currentBestCapacity) {
-                for (int j = 0; j < totalTalkQuantity; j++) {
-                    currentBestSolution[j] = currentSolution[j];
-                    currentBestCapacity = currentCapacity;
-                }
-                return;
+    private void loadTalksIntoSessions() {
+        if (talkList.size() == 0) {
+            return;
+        } else {
+            List<Integer> talkLengthList = Lists.newLinkedList();
+            for (Talk talk : talkList) {
+                talkLengthList.add(talk.getTalkLength());
             }
+            Integer[] originalTalkLengthArray = Arrays.copyOf(talkLengthList.toArray(),talkLengthList.size(), Integer[].class);
+            //TODO:Get rid of magic numbers
+            int sessionCapacity = (count % 2 == 0) ? 120 : 180;
+            //TODO: not 0 and 1, use enum
+            int[] schemedTalksPositions = algorithm.arrange(sessionCapacity, ArrayUtils.toPrimitive(originalTalkLengthArray));
+
+            List<Talk> arrangedTalks = Lists.newLinkedList();
+            for (int index = 0; index < schemedTalksPositions.length; index++) {
+                if (schemedTalksPositions[index] == 1) {
+                    arrangedTalks.add(talkList.get(index));
+                }
+            }
+            Session session = (count % 2 == 0) ? new MorningSession(arrangedTalks) : new AfternoonSession(arrangedTalks);
+            schemedSessionsList.add(session);
+            talkList.removeAll(arrangedTalks);
+            count++;
+            loadTalksIntoSessions();
         }
-        restTimeCapacity -= talkList.get(index).getTalkLength();
-        if (currentCapacity + talkList.get(index).getTalkLength() <= SESSION_CAPACITY) {
-            currentSolution[index] = 1;
-            currentCapacity += talkList.get(index).getTalkLength();
-            backtrace(index + 1);
-            currentCapacity -= talkList.get(index).getTalkLength();
-        }
-        if (currentCapacity + restTimeCapacity > currentBestCapacity) {
-            currentSolution[index] = 0;
-            backtrace(index + 1);
-        }
-        restTimeCapacity += talkList.get(index).getTalkLength();
     }
+
 
 }

@@ -1,11 +1,13 @@
 import algorithm.Algorithm;
 import algorithm.LoaderAlgorithm;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import domain.Talk;
 import domain.Track;
 import org.junit.Test;
 import service.TalkDispatcher;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -17,7 +19,7 @@ public class TalkDispatcherTest {
     public void should_return_track_list_given_talk_list_and_algorithm() throws Exception {
 
         //Given
-        ImmutableList<Talk> talkList = ImmutableList.of(
+        List<Talk> talkList = Lists.newArrayList(
                 new Talk("TitleOne", 60),
                 new Talk("TitleTwo", 60),
                 new Talk("TitleThree", 30),

@@ -8,5 +8,5 @@ import java.util.List;
  * Created by lwzhang on 3/10/15.
  */
 public interface Algorithm {
-    public List<Track> arrange();
+    public int[] arrange(int capacity, int[] weights);
 }

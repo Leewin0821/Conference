@@ -5,7 +5,8 @@ import java.util.List;
 /**
  * Created by lwzhang on 3/9/15.
  */
-public final class Session implements Measurable {
+public abstract class Session {
+
     private List<Talk> talkList;
 
     public Session(List<Talk> talkList) {
@@ -16,12 +17,11 @@ public final class Session implements Measurable {
         return talkList;
     }
 
-    @Override
-    public int countTimeConsumption() {
-        int timeConsumption = 0;
+    public int sessionSize() {
+        int sessionSize = 0;
         for (Talk talk : talkList){
-            timeConsumption += talk.getTalkLength();
+            sessionSize += talk.getTalkLength();
         }
-        return timeConsumption;
+        return sessionSize;
     }
 }
