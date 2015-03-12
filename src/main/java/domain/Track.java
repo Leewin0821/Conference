@@ -12,4 +12,22 @@ public class Track {
     public void addSession(Session session) {
         sessionList.add(session);
     }
+
+    public Session getMorningSessions(){
+        for (Session session : sessionList){
+            if (session instanceof MorningSession){
+                return session;
+            }
+        }
+        return null;
+    }
+
+    public Session getAfternoonSessions(){
+        for (Session session : sessionList){
+            if (session instanceof AfternoonSession){
+                return session;
+            }
+        }
+        return null;
+    }
 }

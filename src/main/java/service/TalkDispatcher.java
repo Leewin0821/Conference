@@ -19,6 +19,8 @@ public final class TalkDispatcher implements Dispatcher {
     private int count = 0;
     private List<Session> schemedSessionsList;
     private List<Track> trackList;
+    private static final int MORNING_SESSION_CAPACITY = 180;
+    private static final int AFTERNOON_SESSION_CAPACITY = 240;
 
     public TalkDispatcher(List<Talk> talkList, Algorithm algorithm) {
         this.talkList = talkList;
@@ -44,6 +46,7 @@ public final class TalkDispatcher implements Dispatcher {
     }
 
     private void loadTalksIntoSessions() {
+
         if (talkList.size() == 0) {
             return;
         } else {
@@ -52,8 +55,7 @@ public final class TalkDispatcher implements Dispatcher {
                 talkLengthList.add(talk.getTalkLength());
             }
             Integer[] originalTalkLengthArray = Arrays.copyOf(talkLengthList.toArray(),talkLengthList.size(), Integer[].class);
-            //TODO:Get rid of magic numbers
-            int sessionCapacity = (count % 2 == 0) ? 120 : 180;
+            int sessionCapacity = (count % 2 == 0) ? MORNING_SESSION_CAPACITY : AFTERNOON_SESSION_CAPACITY;
             //TODO: not 0 and 1, use enum
             int[] schemedTalksPositions = algorithm.arrange(sessionCapacity, ArrayUtils.toPrimitive(originalTalkLengthArray));
 
