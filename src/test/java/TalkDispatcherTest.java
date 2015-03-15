@@ -37,10 +37,6 @@ public class TalkDispatcherTest {
         List<Track> trackList = new TalkDispatcher(talkList, algorithm).dispatch();
 
         //Then
-        for (Track track : trackList){
-            System.out.println(track.getMorningSessions());
-            System.out.println(track.getAfternoonSessions());
-        }
         assertThat(trackList.size(), is(1));
     }
 }

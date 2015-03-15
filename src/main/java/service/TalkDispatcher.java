@@ -2,45 +2,45 @@ package service;
 
 import algorithm.Algorithm;
 import com.google.common.collect.Lists;
-import domain.*;
+import com.google.common.collect.Maps;
+import domain.Talk;
+import domain.Track;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
-import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by leewin on 15/3/8.
  */
 public final class TalkDispatcher implements Dispatcher {
 
+    private static final int TRACK_LENGTH = 420;
     private List<Talk> talkList;
     private Algorithm algorithm;
-    private int count = 0;
-    private List<Session> schemedSessionsList;
+    private int count;
     private List<Track> trackList;
-    private static final int MORNING_SESSION_CAPACITY = 180;
-    private static final int AFTERNOON_SESSION_CAPACITY = 240;
+    private Map<Integer, List<Talk>> schemedTalkMap;
 
     public TalkDispatcher(List<Talk> talkList, Algorithm algorithm) {
+        init(talkList, algorithm);
+    }
+
+    private void init(List<Talk> talkList, Algorithm algorithm) {
+        count = 0;
         this.talkList = talkList;
         this.algorithm = algorithm;
-        schemedSessionsList = Lists.newLinkedList();
         trackList = Lists.newLinkedList();
+        schemedTalkMap = Maps.newHashMap();
     }
 
     @Override
     public List<Track> dispatch() {
         loadTalksIntoSessions();
-        for (int index=0; index < schemedSessionsList.size(); index++){
-            Track track = null;
-            if (index%2 == 0){
-                track = new Track();
-                track.addSession(schemedSessionsList.get(index));
-            } else {
-                track.addSession(schemedSessionsList.get(index));
-                trackList.add(track);
-            }
+        for (int index = 0; index < schemedTalkMap.size(); index++) {
+            Track track = new Track(schemedTalkMap.get(index));
+            trackList.add(track);
         }
         return trackList;
     }
@@ -54,10 +54,9 @@ public final class TalkDispatcher implements Dispatcher {
             for (Talk talk : talkList) {
                 talkLengthList.add(talk.getTalkLength());
             }
-            Integer[] originalTalkLengthArray = Arrays.copyOf(talkLengthList.toArray(),talkLengthList.size(), Integer[].class);
-            int sessionCapacity = (count % 2 == 0) ? MORNING_SESSION_CAPACITY : AFTERNOON_SESSION_CAPACITY;
+            Integer[] originalTalkLengthArray = Arrays.copyOf(talkLengthList.toArray(), talkLengthList.size(), Integer[].class);
             //TODO: not 0 and 1, use enum
-            int[] schemedTalksPositions = algorithm.arrange(sessionCapacity, ArrayUtils.toPrimitive(originalTalkLengthArray));
+            int[] schemedTalksPositions = algorithm.arrange(TRACK_LENGTH, ArrayUtils.toPrimitive(originalTalkLengthArray));
 
             List<Talk> arrangedTalks = Lists.newLinkedList();
             for (int index = 0; index < schemedTalksPositions.length; index++) {
@@ -65,8 +64,7 @@ public final class TalkDispatcher implements Dispatcher {
                     arrangedTalks.add(talkList.get(index));
                 }
             }
-            Session session = (count % 2 == 0) ? new MorningSession(arrangedTalks) : new AfternoonSession(arrangedTalks);
-            schemedSessionsList.add(session);
+            schemedTalkMap.put(count, arrangedTalks);
             talkList.removeAll(arrangedTalks);
             count++;
             loadTalksIntoSessions();

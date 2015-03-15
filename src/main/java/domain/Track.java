@@ -1,5 +1,7 @@
 package domain;
 
+import com.google.common.collect.Lists;
+
 import java.util.List;
 
 /**
@@ -7,27 +9,22 @@ import java.util.List;
  */
 public class Track {
 
-    private List<Session> sessionList;
+    private List<Talk> talkList;
 
-    public void addSession(Session session) {
-        sessionList.add(session);
+    public Track(List<Talk> talkList) {
+        init(talkList);
     }
 
-    public Session getMorningSessions(){
-        for (Session session : sessionList){
-            if (session instanceof MorningSession){
-                return session;
-            }
-        }
-        return null;
+    private void init(List<Talk> talkList) {
+        this.talkList = talkList;
     }
 
-    public Session getAfternoonSessions(){
-        for (Session session : sessionList){
-            if (session instanceof AfternoonSession){
-                return session;
-            }
-        }
-        return null;
+    public void addTalk(Talk talk) {
+        talkList.add(talk);
     }
+
+    public List<Talk> getTalkList(){
+        return talkList;
+    }
+
 }
