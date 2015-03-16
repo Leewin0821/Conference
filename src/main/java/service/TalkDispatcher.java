@@ -4,6 +4,7 @@ import algorithm.Algorithm;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import domain.Talk;
+import domain.TalkList;
 import domain.Track;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -16,11 +17,10 @@ import java.util.Map;
  */
 public final class TalkDispatcher implements Dispatcher {
 
-    private static final int TRACK_LENGTH = 420;
-    private List<Talk> talkList;
+    private final int TRACK_LENGTH = 420;
+    private TalkList talkList;
     private Algorithm algorithm;
     private int count;
-    private List<Track> trackList;
     private Map<Integer, List<Talk>> schemedTalkMap;
 
     public TalkDispatcher(List<Talk> talkList, Algorithm algorithm) {
@@ -29,15 +29,19 @@ public final class TalkDispatcher implements Dispatcher {
 
     private void init(List<Talk> talkList, Algorithm algorithm) {
         count = 0;
-        this.talkList = talkList;
+        this.talkList = new TalkList(talkList);
         this.algorithm = algorithm;
-        trackList = Lists.newLinkedList();
         schemedTalkMap = Maps.newHashMap();
     }
 
     @Override
     public List<Track> dispatch() {
-        loadTalksIntoSessions();
+        loadTalksIntoTracks();
+        return assembleTracks();
+    }
+
+    private List<Track> assembleTracks() {
+        List<Track> trackList = Lists.newLinkedList();
         for (int index = 0; index < schemedTalkMap.size(); index++) {
             Track track = new Track(schemedTalkMap.get(index));
             trackList.add(track);
@@ -45,29 +49,27 @@ public final class TalkDispatcher implements Dispatcher {
         return trackList;
     }
 
-    private void loadTalksIntoSessions() {
+    private void loadTalksIntoTracks() {
 
-        if (talkList.size() == 0) {
+        if (talkList.getSize() == 0) {
             return;
+        } else if (talkList.getTotalTimeLength() <= TRACK_LENGTH) {
+            schemedTalkMap.put(count, talkList.getTalkList());
         } else {
-            List<Integer> talkLengthList = Lists.newLinkedList();
-            for (Talk talk : talkList) {
-                talkLengthList.add(talk.getTalkLength());
-            }
+            List<Integer> talkLengthList = talkList.getTalkLengthList();
             Integer[] originalTalkLengthArray = Arrays.copyOf(talkLengthList.toArray(), talkLengthList.size(), Integer[].class);
-            //TODO: not 0 and 1, use enum
-            int[] schemedTalksPositions = algorithm.arrange(TRACK_LENGTH, ArrayUtils.toPrimitive(originalTalkLengthArray));
+            YesOrNo[] schemedTalksPositions = algorithm.arrange(TRACK_LENGTH, ArrayUtils.toPrimitive(originalTalkLengthArray));
 
             List<Talk> arrangedTalks = Lists.newLinkedList();
             for (int index = 0; index < schemedTalksPositions.length; index++) {
-                if (schemedTalksPositions[index] == 1) {
-                    arrangedTalks.add(talkList.get(index));
+                if (schemedTalksPositions[index] == YesOrNo.YES) {
+                    arrangedTalks.add(talkList.getTalk(index));
                 }
             }
             schemedTalkMap.put(count, arrangedTalks);
-            talkList.removeAll(arrangedTalks);
+            talkList.removeTalks(arrangedTalks);
             count++;
-            loadTalksIntoSessions();
+            loadTalksIntoTracks();
         }
     }
 

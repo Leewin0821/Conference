@@ -29,7 +29,8 @@ public class TalkDispatcherTest {
                 new Talk("TitleSeven", 30),
                 new Talk("TitleEight", 45),
                 new Talk("TitleNine", 45),
-                new Talk("TitleTen", 30)
+                new Talk("TitleTen", 30),
+                new Talk("TitleEleven", 30)
         );
         Algorithm algorithm = new LoaderAlgorithm();
 
@@ -37,6 +38,6 @@ public class TalkDispatcherTest {
         List<Track> trackList = new TalkDispatcher(talkList, algorithm).dispatch();
 
         //Then
-        assertThat(trackList.size(), is(1));
+        assertThat(trackList.size(), is(2));
     }
 }
