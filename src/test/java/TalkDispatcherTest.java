@@ -16,7 +16,7 @@ import static org.junit.Assert.assertThat;
 public class TalkDispatcherTest {
 
     @Test
-    public void should_return_track_list_given_talk_list_and_algorithm() throws Exception {
+    public void should_return_one_track_list_given_talk_list_not_greater_than_420_minutes_and_algorithm() throws Exception {
 
         //Given
         List<Talk> talkList = Lists.newArrayList(
@@ -29,8 +29,24 @@ public class TalkDispatcherTest {
                 new Talk("TitleSeven", 30),
                 new Talk("TitleEight", 45),
                 new Talk("TitleNine", 45),
-                new Talk("TitleTen", 30),
-                new Talk("TitleEleven", 30)
+                new Talk("TitleTen", 30)
+        );
+        Algorithm algorithm = new LoaderAlgorithm();
+
+        //When
+        List<Track> trackList = new TalkDispatcher(talkList, algorithm).dispatch();
+
+        //Then
+        assertThat(trackList.size(), is(1));
+    }
+
+    @Test
+    public void should_return_two_tracks_list_given_talk_list_greater_than_420_minutes_and_algorithm() throws Exception {
+
+        //Given
+        List<Talk> talkList = Lists.newArrayList(
+                new Talk("TitleOne", 420),
+                new Talk("TitleTwo", 30)
         );
         Algorithm algorithm = new LoaderAlgorithm();
 
@@ -39,5 +55,6 @@ public class TalkDispatcherTest {
 
         //Then
         assertThat(trackList.size(), is(2));
+
     }
 }
